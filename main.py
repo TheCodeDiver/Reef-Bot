@@ -3,10 +3,10 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-# Load environment variables from .env
+# Loads environment variables from .env
 load_dotenv()
 
-# Define intents (equivalent to JS version)
+# Define intents
 intents = discord.Intents.default()
 intents.guilds = True
 intents.members = True
@@ -15,7 +15,7 @@ intents.message_content = True
 intents.voice_states = True
 intents.reactions = True
 
-# Create bot instance (using commands.Bot even if no commands yet)
+# Creates bot instance
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
@@ -23,7 +23,7 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
 
 
-# Add your command here, outside of on_ready
+# Test command
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong!")
@@ -34,5 +34,5 @@ async def on_command_error(ctx, error):
         await ctx.send("Command not found. Please use a valid command.")
 
 
-# Start the bot using the token from .env
+# Starts the bot
 bot.run(os.getenv('TOKEN'))

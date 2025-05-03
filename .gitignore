@@ -1,9 +1,19 @@
-# Virtual environment
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__
+
+# Virtual environment directory
 venv/
 
-# Environment variables
-.env
+# IDE files
+.vscode/
+.idea/
 
-# Byte-compiled / cache
-__pycache__/
-*.py[cod]
+# Distribution/Packaging
+*.egg-info/
+dist/
+build/
+
+# Environment files (sensitive data)
+.env
