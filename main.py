@@ -2,6 +2,7 @@ import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+import asyncio
 
 # Load environment variables
 load_dotenv()
@@ -20,8 +21,14 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
-    """Event fired when the bot is ready."""
-    print(f'Logged in as {bot.user}')
+    print(f'✅ Logged in as {bot.user}')
 
-# Start the bot
-bot.run(os.getenv('TOKEN'))
+async def load_extensions():
+    await bot.load_extension("cogs.task_tracker")
+
+async def main():
+    async with bot:
+        await load_extensions()
+        await bot.start(os.getenv('TOKEN'))
+
+asyncio.run(main())
