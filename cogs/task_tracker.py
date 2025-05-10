@@ -55,5 +55,44 @@ class TaskTracker(commands.Cog):
         else:
             await ctx.send("⚠️ Invalid task number.")
 
+
+    @commands.command(name="deletetask")
+    async def delete_task(self, ctx, task_number: int):
+        user_id = str(ctx.author.id)
+        user_tasks = self.tasks.get(user_id, [])
+
+        if 0 < task_number <= len(user_tasks):
+            removed_task = self.tasks[user_id].pop(task_number - 1)
+            save_tasks(self.tasks)
+            await ctx.send(f"🗑️ Deleted task {task_number}: `{removed_task['task']}`")
+        else:
+            await ctx.send("⚠️ Invalid task number.")
+
+
+    @commands.command(name="updatetask")
+    async def update_task(self, ctx, task_number: int, *, new_description: str):
+        user_id = str(ctx.author.id)
+        user_tasks = self.tasks.get(user_id, [])
+
+        if 0 < task_number <= len(user_tasks):
+            old_description = user_tasks[task_number - 1]["task"]
+            self.tasks[user_id][task_number - 1]["task"] = new_description
+            save_tasks(self.tasks)
+            await ctx.send(f"✏️ Task {task_number} updated:\n**Before:** {old_description}\n**After:** {new_description}")
+        else:
+            await ctx.send("⚠️ Invalid task number.")
+
+    @commands.command(name="cleartasks")
+    async def clear_tasks(self, ctx):
+        user_id = str(ctx.author.id)
+
+        if user_id in self.tasks and self.tasks[user_id]:
+            self.tasks[user_id] = []
+            save_tasks(self.tasks)
+            await ctx.send("🧼 All your tasks have been cleared.")
+        else:
+            await ctx.send("📭 You don't have any tasks to clear.")
+
+
 async def setup(bot):
     await bot.add_cog(TaskTracker(bot))
