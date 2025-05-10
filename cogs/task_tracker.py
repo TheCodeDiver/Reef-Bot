@@ -23,16 +23,37 @@ class TaskTracker(commands.Cog):
         self.tasks = load_tasks()
 
     @commands.command(name="addtask")
-    async def add_task(self, ctx, *, task: str):
+    async def add_task(self, ctx, *, task_input: str):
         user_id = str(ctx.author.id)
-        self.tasks.setdefault(user_id, []).append({"task": task, "done": False})
+
+        # Split on the last " | " for deadline
+        if " | " in task_input:
+            task_desc, deadline = task_input.rsplit(" | ", 1)
+            deadline = deadline.strip()
+        else:
+            task_desc = task_input
+            deadline = None
+
+        task = {
+            "task": task_desc.strip(),
+            "done": False,
+            "deadline": deadline
+        }
+
+        self.tasks.setdefault(user_id, []).append(task)
         save_tasks(self.tasks)
-        await ctx.send(f"✅ Task added: `{task}`")
+        
+        response = f"✅ Task added: `{task_desc.strip()}`"
+        if deadline:
+            response += f" (Deadline: `{deadline}`)"
+        await ctx.send(response)
+
 
     @commands.command(name="tasks")
     async def list_tasks(self, ctx):
         user_id = str(ctx.author.id)
         user_tasks = self.tasks.get(user_id, [])
+        
         if not user_tasks:
             await ctx.send("📭 You have no tasks.")
             return
@@ -40,9 +61,12 @@ class TaskTracker(commands.Cog):
         msg = "**Your Tasks:**\n"
         for idx, task in enumerate(user_tasks, 1):
             status = "✅" if task["done"] else "❌"
-            msg += f"{idx}. {status} {task['task']}\n"
+            deadline = f" (Deadline: {task['deadline']})" if task.get("deadline") else ""
+            msg += f"{idx}. {status} {task['task']}{deadline}\n"
 
         await ctx.send(msg)
+
+
 
     @commands.command(name="completetask")
     async def complete_task(self, ctx, task_number: int):
